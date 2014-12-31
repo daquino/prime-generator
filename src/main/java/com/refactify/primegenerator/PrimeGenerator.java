@@ -2,7 +2,7 @@ package com.refactify.primegenerator;
 
 public class PrimeGenerator {
 
-    private static boolean[] f;
+    private static boolean[] isCrossed;
     private static int[] result;
 
 
@@ -19,39 +19,49 @@ public class PrimeGenerator {
     }
 
     private static void initializeArrayOfIntegers(final int maxValue) {
-        f = new boolean[maxValue + 1];
-        f[0] = f[1] = false;
-        for (int i = 2; i < f.length; i++)
-            f[i] = true;
+        isCrossed = new boolean[maxValue + 1];
+        for (int i = 2; i < isCrossed.length; i++)
+            isCrossed[i] = false;
     }
 
     private static void crossOutMultiples() {
-        int i;
-        int j;
-        for (i = 2; i < Math.sqrt(f.length) + 1; i++) {
-            if(f[i]) {
-                for (j = 2 * i; j < f.length; j += i) {
-                    f[j] = false;
-                }
+        int maxPrimeFactor = calculateMaxPrimeFactor();
+        for (int i = 2; i < maxPrimeFactor; i++) {
+            if(notCrossed(i)) {
+                crossOutMultiplesOf(i);
             }
+        }
+    }
+
+    private static int calculateMaxPrimeFactor() {
+        return (int)Math.sqrt(isCrossed.length) + 1;
+    }
+
+    private static boolean notCrossed(final int i) {
+        return isCrossed[i] == false;
+    }
+
+    private static void crossOutMultiplesOf(final int i) {
+        for (int multiple = 2 * i; multiple < isCrossed.length; multiple += i) {
+            isCrossed[multiple] = true;
         }
     }
 
     private static void putUncrossedIntegersIntoResult() {
-        int i;
-        int j;
-
-        int count = 0;
-        for (i = 0; i < f.length; i++) {
-            if(f[i])
-                count++;
-        }
-
-        result = new int[count];
-        for (i = 0, j = 0; i < f.length; i++) {
-            if(f[i]) {
+        result = new int[numberOfUncrossedIntegers()];
+        for (int i = 2, j = 0; i < isCrossed.length; i++) {
+            if(notCrossed(i)) {
                 result[j++] = i;
             }
         }
+    }
+
+    private static int numberOfUncrossedIntegers() {
+        int count = 0;
+        for (int i = 2; i < isCrossed.length; i++) {
+            if(notCrossed(i))
+                count++;
+        }
+        return count;
     }
 }
